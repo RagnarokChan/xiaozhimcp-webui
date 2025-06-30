@@ -6,7 +6,7 @@
 
 - 🌐 **Web管理界面** - 直观的MCP服务控制面板
 - 🐳 **Docker部署** - 一键启动，开箱即用
-- 🔧 **依赖自动安装** - 智能检测和安装MCP服务依赖
+- 🔧 **双镜像安装** - 默认配置依赖或手动安装
 - 📝 **配置管理** - 支持JSON配置文件导入导出
 - 🔄 **服务控制** - 启动、停止、重启MCP服务
 - 📊 **状态监控** - 实时查看服务运行状态和日志
@@ -46,7 +46,7 @@ IMAGE_TYPE=full docker compose up -d
 ### 一键部署
 ```bash
 # 克隆项目
-git clone <repository-url>
+git clone https://github.com/RagnarokChan/xiaozhimcp-webui.git
 cd zhimcp-control
 
 # 启动服务（轻量版）
@@ -248,18 +248,6 @@ docker compose up -d --build
 curl http://localhost:5050/system_info | jq .dependencies
 ```
 
-## 📁 项目结构
-
-```
-zhimcp-control/
-├── docker-compose.yml    # Docker Compose配置
-├── Dockerfile           # Docker镜像构建
-├── mcp_config.json      # MCP服务配置（默认为空）
-├── simple_mcp_launcher.py # 主程序
-├── requirements.txt     # Python依赖
-├── templates/           # Web模板
-├── uploads/            # 配置文件上传目录
-└── logs/               # 日志目录
 ```
 
 ## 🔧 配置文件
