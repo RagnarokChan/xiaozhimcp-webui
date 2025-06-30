@@ -1,0 +1,23 @@
+services:
+  mcp-launcher:
+    build: 
+      context: .
+      target: ${IMAGE_TYPE:-full}
+    container_name: mcp-launcher
+    ports:
+      - "5050:5050"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+      - ./mcp_config.json:/app/mcp_config.json
+    environment:
+      - MCP_PORT=5050
+      - MCP_HOST=0.0.0.0
+      - MCP_DEBUG=false
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5050/system_info"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s 

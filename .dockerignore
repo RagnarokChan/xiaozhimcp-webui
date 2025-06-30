@@ -1,0 +1,73 @@
+# Git相关
+.git
+.gitignore
+
+# Python相关
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache
+.pytest_cache
+.hypothesis
+
+# 虚拟环境
+venv/
+env/
+ENV/
+
+# IDE相关
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 项目相关
+logs/
+*.log
+uploads/*
+!uploads/.gitkeep
+mcp_config.json.backup*
+backup_*.tar.gz
+
+# 文档和安装脚本（Docker不需要，但保留README.md）
+*.md
+!README.md
+docs/
+install.sh
+install.bat
+DEPLOYMENT.md
+
+# 示例和配置文件
+example_*
+*.example
+
+# 测试文件
+tests/
+test_*.py
+
+# 开发工具
+.flake8
+.black
+.isort.cfg
+
+# Nginx相关（已移除）
+nginx/ 

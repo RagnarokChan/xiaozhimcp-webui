@@ -1,0 +1,29 @@
+# 小智AI MCP启动器 - Python依赖列表
+# 
+# 安装方法:
+# pip install -r requirements.txt
+# 或
+# pip3 install -r requirements.txt
+
+# 核心依赖 (必需)
+Flask==3.0.3
+websockets==13.1
+python-dotenv==1.0.1
+
+# MCP 核心依赖
+mcp==1.0.0
+
+# Python MCP 服务依赖 (常用的可以预装)
+# 文件系统操作
+# 数据库连接
+# 科学计算
+numpy==1.24.0
+pandas==2.0.0
+
+# 可选依赖 (用于UVX服务)
+# uv  # 通过系统包管理器安装
+
+# 开发依赖 (可选)
+# pytest>=7.0.0
+# black>=23.0.0
+# flake8>=6.0.0 

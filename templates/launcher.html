@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小智AI聊天机器人 - MCP WEBUI v1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1976d2, #1565c0);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .version {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+
+        .main-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e1e8ed;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .card-header {
+            padding: 1rem 1.5rem;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e1e8ed;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .upload-area {
+            border: 2px dashed #d1d9e6;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            border-color: #1976d2;
+            background: #f0f8ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #1976d2;
+            background: #e3f2fd;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #1976d2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1565c0;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #dee2e6;
+            color: #6c757d;
+        }
+
+        .btn-outline:hover {
+            background: #f8f9fa;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .control-panel {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .server-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .server-item {
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            background: white;
+            overflow: hidden;
+        }
+
+        .server-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .server-name {
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .server-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-running {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-stopped {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-disabled {
+            background: #e2e3e5;
+            color: #6c757d;
+        }
+
+        .server-details {
+            padding: 1rem;
+        }
+
+        .server-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            background: #f8f9fa;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-value {
+            color: #333;
+            font-family: monospace;
+        }
+
+        .server-controls {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .dependencies {
+            margin-top: 1rem;
+        }
+
+        .dep-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #f8f9fa;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin: 0.25rem;
+        }
+
+        .dep-installed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .dep-missing {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+        }
+
+        .system-info {
+            font-size: 0.9rem;
+        }
+
+        .system-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .system-item:last-child {
+            border-bottom: none;
+        }
+
+        .logs-container {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #1e1e1e;
+            color: #f1f1f1;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            margin-bottom: 0.5rem;
+        }
+
+        .log-timestamp {
+            color: #888;
+            margin-right: 0.5rem;
+        }
+
+        .log-stdout {
+            color: #4CAF50;
+        }
+
+        .log-stderr {
+            color: #f44336;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-success {
+            background: #28a745;
+        }
+
+        .toast-error {
+            background: #dc3545;
+        }
+
+        .toast-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .json-editor {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            resize: vertical;
+            min-height: 200px;
+        }
+
+        .json-editor:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .control-panel {
+                flex-direction: column;
+            }
+            
+            .server-controls {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            🤖 小智AI聊天机器人 - MCP WEBUI v1
+        </div>
+        <div>
+            在线服务: <span id="online-count">0</span> / 总计: <span id="total-count">0</span> | 
+            WebSocket: <span id="websocket-status" style="color: #ff9800;">未连接</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="main-panel">
+            <!-- 控制面板 -->
+            <div class="card">
+                <div class="card-header">
+                    🎛️ 控制面板
+                </div>
+                <div class="card-content">
+                    <div class="control-panel">
+                        <button class="btn btn-success" onclick="startAllServers()">
+                            ▶️ 启动全部
+                        </button>
+                        <button class="btn btn-danger" onclick="stopAllServers()">
+                            ⏹️ 停止全部
+                        </button>
+                        <button class="btn btn-secondary" onclick="refreshStatus()">
+                            🔄 刷新状态
+                        </button>
+                        <button class="btn btn-primary" onclick="exportConfig()">
+                            📥 导出配置
+                        </button>
+                        <button class="btn btn-success" onclick="saveSettings()">
+                            💾 保存设置
+                        </button>
+                        <button class="btn btn-warning" onclick="showSystemInfo()">
+                            ℹ️ 系统信息
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 服务列表 -->
+            <div class="card">
+                <div class="card-header">
+                    📋 MCP服务列表
+                    <span class="badge">{{ servers|length }} 个服务</span>
+                </div>
+                <div class="card-content">
+                    <div class="server-list" id="server-list">
+                        {% if servers %}
+                            {% for name, server in servers.items() %}
+                            <div class="server-item" data-server="{{ name }}">
+                                <div class="server-header">
+                                    <div class="server-name">
+                                        <input type="checkbox" class="checkbox" 
+                                               onchange="toggleServer('{{ name }}')"
+                                               {{ 'checked' if not server.config.get('disabled', False) else '' }}>
+                                        {{ name }}
+                                    </div>
+                                    <span class="server-status status-{{ server.status }}
+                                          {{ 'status-disabled' if server.config.get('disabled', False) else '' }}">
+                                        {% if server.config.get('disabled', False) %}
+                                            已禁用
+                                        {% elif server.status == 'running' %}
+                                            运行中
+                                        {% else %}
+                                            已停止
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                
+                                <div class="server-details">
+
+
+
+                                    <div class="server-controls">
+                                        {% if server.status == 'running' %}
+                                        <button class="btn btn-danger btn-sm" onclick="stopServer('{{ name }}')">
+                                            ⏹️ 停止
+                                        </button>
+                                        <button class="btn btn-warning btn-sm" onclick="restartServer('{{ name }}')">
+                                            🔄 重启
+                                        </button>
+                                        {% else %}
+                                        <button class="btn btn-success btn-sm" onclick="startServer('{{ name }}')"
+                                                {{ 'disabled' if server.config.get('disabled', False) else '' }}>
+                                            ▶️ 启动
+                                        </button>
+                                        {% endif %}
+                                        <button class="btn btn-secondary btn-sm" onclick="showLogs('{{ name }}')">
+                                            📋 日志
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div style="text-align: center; padding: 2rem; color: #666;">
+                                暂无MCP服务配置，请上传配置文件
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <!-- 配置上传 -->
+            <div class="card">
+                <div class="card-header">
+                    📁 配置管理
+                </div>
+                <div class="card-content">
+                    <div class="upload-area" id="upload-area">
+                        <p>📄 拖拽JSON文件到此处</p>
+                        <p>或点击选择文件</p>
+                        <input type="file" id="config-file" accept=".json" style="display: none;">
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="document.getElementById('config-file').click()">
+                        选择配置文件
+                    </button>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                        <button class="btn btn-success" style="flex: 1;" onclick="saveSettings()">
+                            💾 保存设置
+                        </button>
+                        <button class="btn btn-secondary" style="flex: 1;" onclick="loadSettings()">
+                            📂 加载设置
+                        </button>
+                        <button class="btn btn-outline" onclick="exportSettings()">
+                            📤 导出
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JSON配置编辑器 -->
+            <div class="card">
+                <div class="card-header">
+                    ⚙️ JSON配置编辑器
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label class="form-label">MCP配置JSON</label>
+                        <textarea class="form-control json-editor" id="json-config" 
+                                  placeholder='{"mcpServers": {}}'
+                                  rows="12"></textarea>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-success" style="flex: 1;" onclick="importFromJson()">
+                            📥 导入配置
+                        </button>
+                        <button class="btn btn-outline" onclick="clearJson()">
+                            🗑️ 清空
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WebSocket设置 -->
+            <div class="card">
+                <div class="card-header">
+                    🔗 WebSocket设置
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label class="form-label">WebSocket地址</label>
+                        <input type="text" class="form-control" id="websocket-url" 
+                               value="{{ websocket_url }}" placeholder="wss://api.xiaozhi.me/mcp?token=your_token">
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%;" onclick="updateWebSocket()">
+                        保存并应用
+                    </button>
+                </div>
+            </div>
+
+            <!-- 系统状态 -->
+            <div class="card">
+                <div class="card-header">
+                    💻 系统状态
+                </div>
+                <div class="card-content">
+                    <div class="system-info">
+                        <div class="system-item">
+                            <span>在线服务</span>
+                            <span id="status-online">0</span>
+                        </div>
+                        <div class="system-item">
+                            <span>离线服务</span>
+                            <span id="status-offline">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 日志模态框 -->
+    <div id="logs-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>服务日志 - <span id="logs-server-name"></span></h3>
+                <span class="close" onclick="closeLogs()">&times;</span>
+            </div>
+            <div class="logs-container" id="logs-content">
+                加载中...
+            </div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn btn-secondary" onclick="refreshLogs()">刷新日志</button>
+                <button class="btn btn-primary" onclick="closeLogs()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 系统信息模态框 -->
+    <div id="system-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>系统信息</h3>
+                <span class="close" onclick="closeSystemInfo()">&times;</span>
+            </div>
+            <div id="system-content">
+                加载中...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentLogsServer = null;
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeUpload();
+            updateServerCounts();
+            startPeriodicRefresh();
+            loadConfigToEditor();
+        });
+
+        // 初始化文件上传
+        function initializeUpload() {
+            const uploadArea = document.getElementById('upload-area');
+            const fileInput = document.getElementById('config-file');
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('drop', handleDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                uploadConfig(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                uploadConfig(file);
+            }
+        }
+
+        // 上传配置文件 - 自动导入到JSON编辑器
+        function uploadConfig(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const jsonContent = e.target.result;
+                    const parsed = JSON.parse(jsonContent);
+                    
+                    // 直接填入JSON编辑器
+                    document.getElementById('json-config').value = JSON.stringify(parsed, null, 2);
+                    showToast('配置文件已加载到编辑器', 'success');
+                } catch (error) {
+                    showToast('文件格式错误: ' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // 加载配置到编辑器
+        function loadConfigToEditor() {
+            fetch('/get_config')
+            .then(response => response.json())
+            .then(data => {
+                const jsonEditor = document.getElementById('json-config');
+                jsonEditor.value = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                console.error('加载配置失败:', error);
+            });
+        }
+
+        // 从JSON编辑器导入配置
+        function importFromJson() {
+            const jsonEditor = document.getElementById('json-config');
+            const jsonText = jsonEditor.value.trim();
+            
+            if (!jsonText) {
+                showToast('请输入JSON配置', 'error');
+                return;
+            }
+
+            try {
+                // 验证JSON格式
+                const config = JSON.parse(jsonText);
+                
+                if (!config.mcpServers) {
+                    showToast('无效的配置格式，缺少mcpServers字段', 'error');
+                    return;
+                }
+
+                // 发送配置到服务器
+                fetch('/import_json_config', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(config)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('JSON配置导入成功', 'success');
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        showToast(data.error || '导入失败', 'error');
+                    }
+                })
+                .catch(error => {
+                    showToast('导入异常: ' + error.message, 'error');
+                });
+
+            } catch (e) {
+                showToast('JSON格式错误: ' + e.message, 'error');
+            }
+        }
+
+
+
+        // 清空JSON编辑器
+        function clearJson() {
+            if (confirm('确定要清空JSON配置吗？')) {
+                document.getElementById('json-config').value = '';
+                showToast('JSON配置已清空', 'success');
+            }
+        }
+
+        // 保存并应用WebSocket地址
+        function updateWebSocket() {
+            const url = document.getElementById('websocket-url').value;
+            
+            fetch('/update_websocket', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({url: url})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('WebSocket地址已保存并应用', 'success');
+                } else {
+                    showToast(data.error || '保存失败', 'error');
+                }
+            });
+        }
+
+        // 服务控制
+        function startServer(name) {
+            controlServer(name, 'start');
+        }
+
+        function stopServer(name) {
+            controlServer(name, 'stop');
+        }
+
+        function restartServer(name) {
+            controlServer(name, 'restart');
+        }
+
+        function controlServer(name, action) {
+            fetch(`/${action}/${name}`, {method: 'POST'})
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message || `${action}成功`, 'success');
+                    updateServerStatus(name, data);
+                } else {
+                    showToast(data.error || data.message || `${action}失败`, 'error');
+                }
+            })
+            .catch(error => {
+                showToast(`${action}异常: ` + error.message, 'error');
+            });
+        }
+
+        // 批量控制
+        function startAllServers() {
+            fetch('/start_all', {method: 'POST'})
+            .then(response => response.json())
+            .then(data => {
+                let successCount = 0;
+                data.results.forEach(result => {
+                    if (result.success) successCount++;
+                });
+                showToast(`批量启动完成: ${successCount}/${data.results.length}`, 'success');
+                setTimeout(() => location.reload(), 1000);
+            });
+        }
+
+        function stopAllServers() {
+            fetch('/stop_all', {method: 'POST'})
+            .then(response => response.json())
+            .then(data => {
+                let successCount = 0;
+                data.results.forEach(result => {
+                    if (result.success) successCount++;
+                });
+                showToast(`批量停止完成: ${successCount}/${data.results.length}`, 'success');
+                setTimeout(() => location.reload(), 1000);
+            });
+        }
+
+        // 切换服务启用状态
+        function toggleServer(name) {
+            fetch(`/toggle_server/${name}`, {method: 'POST'})
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const status = data.disabled ? '已禁用' : '已启用';
+                    showToast(`${name} ${status}`, 'success');
+                    updateServerStatus(name, data);
+                } else {
+                    showToast(data.error || '切换失败', 'error');
+                }
+            });
+        }
+
+        // 安装依赖
+        function installDependency(dep) {
+            showToast(`正在安装依赖: ${dep}`, 'warning');
+            
+            fetch(`/install_dependency/${dep}`, {method: 'POST'})
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    showToast(data.message || '安装失败', 'error');
+                }
+            });
+        }
+
+        // 显示日志
+        function showLogs(serverName) {
+            currentLogsServer = serverName;
+            document.getElementById('logs-server-name').textContent = serverName;
+            document.getElementById('logs-modal').style.display = 'block';
+            refreshLogs();
+        }
+
+        function refreshLogs() {
+            if (!currentLogsServer) return;
+            
+            fetch(`/server_logs/${currentLogsServer}`)
+            .then(response => response.json())
+            .then(data => {
+                const logsContent = document.getElementById('logs-content');
+                if (data.logs && data.logs.length > 0) {
+                    logsContent.innerHTML = data.logs.map(log => {
+                        const timestamp = new Date(log.timestamp * 1000).toLocaleTimeString();
+                        return `<div class="log-entry">
+                            <span class="log-timestamp">[${timestamp}]</span>
+                            <span class="log-${log.type}">${log.message}</span>
+                        </div>`;
+                    }).join('');
+                } else {
+                    logsContent.innerHTML = '<div style="color: #888;">暂无日志</div>';
+                }
+                logsContent.scrollTop = logsContent.scrollHeight;
+            });
+        }
+
+        function closeLogs() {
+            document.getElementById('logs-modal').style.display = 'none';
+            currentLogsServer = null;
+        }
+
+        // 显示系统信息
+        function showSystemInfo() {
+            document.getElementById('system-modal').style.display = 'block';
+            
+            fetch('/system_info')
+            .then(response => response.json())
+            .then(data => {
+                const content = document.getElementById('system-content');
+                content.innerHTML = `
+                    <div class="system-info">
+                        <h4>系统信息</h4>
+                        <div class="system-item">
+                            <span>平台</span>
+                            <span>${data.system.platform}</span>
+                        </div>
+                        <div class="system-item">
+                            <span>Python版本</span>
+                            <span>${data.system.python_version}</span>
+                        </div>
+                        <div class="system-item">
+                            <span>工作目录</span>
+                            <span>${data.system.working_directory}</span>
+                        </div>
+                        
+                        <h4 style="margin-top: 2rem;">依赖状态</h4>
+                        ${Object.entries(data.dependencies).map(([dep, info]) => `
+                            <div class="system-item">
+                                <span>${dep} (${info.description})</span>
+                                <span class="dep-item dep-${info.installed ? 'installed' : 'missing'}">
+                                    ${info.installed ? '已安装' : '未安装'}
+                                </span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            });
+        }
+
+        function closeSystemInfo() {
+            document.getElementById('system-modal').style.display = 'none';
+        }
+
+        // 导出配置
+        function exportConfig() {
+            window.open('/export_config', '_blank');
+        }
+
+        // 保存当前设置
+        function saveSettings() {
+            const websocketUrl = document.getElementById('websocket-url').value;
+            
+            fetch('/save_settings', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({websocket_url: websocketUrl})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message, 'success');
+                } else {
+                    showToast(data.error || '保存失败', 'error');
+                }
+            });
+        }
+
+        // 加载已保存的设置
+        function loadSettings() {
+            fetch('/load_settings', {method: 'POST'})
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    // 更新界面
+                    document.getElementById('websocket-url').value = data.websocket_url;
+                    document.getElementById('json-config').value = JSON.stringify(data.config, null, 2);
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showToast(data.error || '加载失败', 'error');
+                }
+            });
+        }
+
+        // 导出设置
+        function exportSettings() {
+            window.open('/export_settings', '_blank');
+        }
+
+        // 刷新状态
+        function refreshStatus() {
+            location.reload();
+        }
+
+        // 更新服务器状态
+        function updateServerStatus(name, data) {
+            const serverItem = document.querySelector(`[data-server="${name}"]`);
+            if (serverItem) {
+                const statusElement = serverItem.querySelector('.server-status');
+                statusElement.className = `server-status status-${data.status}`;
+                statusElement.textContent = data.status === 'running' ? '运行中' : '已停止';
+            }
+            updateServerCounts();
+        }
+
+        // 更新服务器计数
+        function updateServerCounts() {
+            const runningCount = document.querySelectorAll('.status-running').length;
+            const totalCount = document.querySelectorAll('.server-item').length;
+            
+            document.getElementById('online-count').textContent = runningCount;
+            document.getElementById('total-count').textContent = totalCount;
+            document.getElementById('status-online').textContent = runningCount;
+            document.getElementById('status-offline').textContent = totalCount - runningCount;
+        }
+
+        // 定期刷新
+        function startPeriodicRefresh() {
+            setInterval(() => {
+                // 更新运行时间
+                document.querySelectorAll('[id^="uptime-"]').forEach(element => {
+                    const serverName = element.id.replace('uptime-', '');
+                    // 这里可以通过API获取最新的运行时间
+                });
+                
+                // 更新WebSocket状态
+                updateWebSocketStatus();
+            }, 1000);
+        }
+
+        // 更新WebSocket连接状态
+        function updateWebSocketStatus() {
+            fetch('/websocket_status')
+                .then(response => response.json())
+                .then(data => {
+                    const statusElement = document.getElementById('websocket-status');
+                    if (data.connected) {
+                        statusElement.textContent = '已连接';
+                        statusElement.style.color = '#4caf50';
+                    } else {
+                        statusElement.textContent = '未连接';
+                        statusElement.style.color = '#ff9800';
+                    }
+                })
+                .catch(error => {
+                    const statusElement = document.getElementById('websocket-status');
+                    statusElement.textContent = '检查失败';
+                    statusElement.style.color = '#f44336';
+                });
+        }
+
+        // 显示提示消息
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type} show`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const logsModal = document.getElementById('logs-modal');
+            const systemModal = document.getElementById('system-modal');
+            
+            if (event.target === logsModal) {
+                closeLogs();
+            }
+            if (event.target === systemModal) {
+                closeSystemInfo();
+            }
+        }
+    </script>
+</body>
+</html> 
